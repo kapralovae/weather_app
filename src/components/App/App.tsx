@@ -26,9 +26,9 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+// type SectionProps = PropsWithChildren<{
+//   title: string;
+// }>;
 
 // function Section({children, title}: SectionProps): JSX.Element {
 //   const isDarkMode = useColorScheme() === 'dark';
@@ -67,62 +67,111 @@ function App(): JSX.Element {
 
 
   async function getWeather () {
-    // const response = await fetch(api_url);
-  
-    // return await response.json();
     try {
-      const response = await fetch('https://api.openweathermap.org/data/2.5/weather?lat=59.90&lon=30.26&lang=ru&appid=d4ef21df72b68f08effe99dce8a6be38',);
+      const response = await fetch('https://api.openweathermap.org/data/2.5/weather?lat=59.90&lon=30.26&lang=ru&appid=d4ef21df72b68f08effe99dce8a6be38&units=metric',);
       const json = await response.json();
-      setWeather(json.weather[0]);
+      setWeather({weather:json.weather[0], main: json.main, name: json.name});
     } catch (error) {
       console.error(error);
     }
   };
   
   type Weather = {
-    "id": number,
-    "main": string,
-    "description": string,
-    "icon": string,
+    weather : {
+      "id": number,
+      "main": string,
+      "description": string,
+      "icon": string,
+    },
+    main: {
+      temp: number,
+      feels_like: number,
+      temp_min: number,
+      temp_max: number,
+      pressure: number,
+      humidity: number,
+      sea_level: number,
+      grnd_level: number,
+    },
+    name: string,
   };
   
   const [weather, setWeather] = useState<Weather>({
-    "id": 0,
-    "main": '',
-    "description": '',
-    "icon": '',
+    weather: {
+      id: 0,
+      main: '',
+      description: '',
+      icon: ''
+    },
+    main: {
+      temp: 298.48,
+      feels_like: 298.74,
+      temp_min: 297.56,
+      temp_max: 300.05,
+      pressure: 1015,
+      humidity: 64,
+      sea_level: 1015,
+      grnd_level: 933
+    },
+    name: '',
   });
   
   useEffect(() => {
     getWeather();
+    console.log(weather);
   }, []);
   
   function WeatherDegrees () {
     return (
       <>
-        <Text style={styles.inputWeather}>{weather.description}</Text>
-        <Text>Хуй</Text>
+        <Text style={styles.degrees}>{weather.main.temp > 0 ? '+' + Math.ceil(weather.main.temp) + '°C'  : Math.ceil(weather.main.temp)}</Text>
+        <Text style={styles.inputWeather}>{weather.weather.description}</Text>
       </>
     );
   }
 
   return (
-    <SafeAreaView style={styles.sectionContainer}>
-      <WeatherDegrees  />
-      
-    </SafeAreaView>
+    <View style={styles.container}>
+      <Text style={styles.h1}>Welcome to WeatherApp</Text>
+      <Text style={styles.city}>{weather.name}</Text>
+      <View style={styles.container}>
+        <WeatherDegrees />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    backgroundColor: '#a77fb5',
+  container: {
+    backgroundColor: 'royalblue',
     marginTop: 32,
     paddingHorizontal: 24,
+    marginStart: 10,
+  },
+  h1: {
+    fontSize: 25,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: 'sandybrown',
+  },
+  city: {
+    marginTop: 10,
+    fontSize: 20,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: 'sandybrown',
+  },
+  degrees: {
+    fontSize: 50,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: 'white',
   },
   inputWeather: {
-    borderWidth: 1,
-    borderRadius: 10,
+    fontSize: 20,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: 'white',
   },
 });
 
